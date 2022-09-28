@@ -22,8 +22,15 @@ func (s *Server) AddMidleware(f http.HandlerFunc, middlewares ...Middleware) htt
 }
 
 // Add route to a specific handler
-func (s *Server) Handle(path string, handler http.HandlerFunc) {
-	s.router.rules[path] = handler
+func (s *Server) Handle(method string, path string, handler http.HandlerFunc) {
+	_, exist := s.router.rules[path]
+
+	// If the map doesn't exist, create it
+	if !exist {
+		s.router.rules[path] = make(map[string]http.HandlerFunc)
+	}
+
+	s.router.rules[path][method] = handler
 }
 
 func (s *Server) Listen() error {
